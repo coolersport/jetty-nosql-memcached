@@ -25,7 +25,6 @@ import org.eclipse.jetty.nosql.kvs.session.ISerializableSession;
 import org.eclipse.jetty.nosql.kvs.session.TranscoderException;
 import org.eclipse.jetty.nosql.kvs.session.serializable.SerializableSessionFactory;
 import org.eclipse.jetty.server.SessionIdManager;
-import org.eclipse.jetty.server.session.AbstractSession;
 import org.eclipse.jetty.util.log.Log;
 import org.eclipse.jetty.util.log.Logger;
 
@@ -83,7 +82,8 @@ public class KeyValueStoreSessionManager extends NoSqlSessionManager
             // use context class loader during object deserialization.
             // thanks Daniel Peters!
             ClassLoader cl = getContext().getClassLoader();
-            if (cl != null) {
+            if (cl != null)
+            {
                 sessionFactory.setClassLoader(cl);
                 log.info("use context class loader for session deserializer.");
             }
@@ -104,13 +104,14 @@ public class KeyValueStoreSessionManager extends NoSqlSessionManager
         // we do not want to invalidate all sessions on servlets restart.
         log.info("stopping...");
         super.doStop();
+        _sessions.clear();
         log.info("stopped.");
     }
 
     /* ------------------------------------------------------------ */
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.eclipse.jetty.server.session.AbstractSessionManager#setSessionIdManager
      * (org.eclipse.jetty.server.SessionIdManager)
      */
@@ -168,8 +169,8 @@ public class KeyValueStoreSessionManager extends NoSqlSessionManager
             }
             catch (TranscoderException error)
             {
-                throw (new IllegalArgumentException("unable to serialize session: id=" + session.getId() + ", data="
-                    + data, error));
+                throw (new IllegalArgumentException(
+                    "unable to serialize session: id=" + session.getId() + ", data=" + data, error));
             }
             log.debug("save:db.sessions.update(" + session.getId() + "," + data + ")");
 
@@ -277,18 +278,18 @@ public class KeyValueStoreSessionManager extends NoSqlSessionManager
         return null;
     }
 
-    @Override
-    protected void addSession(final AbstractSession session)
-    {
-        // nop
-    }
-
-    @Override
-    public AbstractSession getSession(final String idInCluster)
-    {
-        AbstractSession session;
-        return loadSession(idInCluster);
-    }
+    //@Override
+    //protected void addSession(final AbstractSession session)
+    //{
+    //    // nop
+    //}
+    //
+    //@Override
+    //public AbstractSession getSession(final String idInCluster)
+    //{
+    //    AbstractSession session;
+    //    return loadSession(idInCluster);
+    //}
 
     /*------------------------------------------------------------ */
     @Override
@@ -383,11 +384,11 @@ public class KeyValueStoreSessionManager extends NoSqlSessionManager
         }
     }
 
-    @Override
-    protected boolean removeSession(final String idInCluster)
-    {
-        return deleteKey(idInCluster);
-    }
+    //@Override
+    //protected boolean removeSession(final String idInCluster)
+    //{
+    //    return deleteKey(idInCluster);
+    //}
 
     protected String mangleKey(final String idInCluster)
     {
@@ -455,7 +456,8 @@ public class KeyValueStoreSessionManager extends NoSqlSessionManager
      * @deprecated from 0.3.1. use #
      *             {@link KeyValueStoreSessionManager#setSessionFactory(org.eclipse.jetty.nosql.kvs.session.AbstractSessionFactory)}
      *             instead.
-     * @param sf AbstractSessionFactory
+     * @param sf
+     *            AbstractSessionFactory
      */
     @Deprecated
     public void setSessionFacade(final AbstractSessionFactory sf)
@@ -476,7 +478,8 @@ public class KeyValueStoreSessionManager extends NoSqlSessionManager
 
     /**
      * @deprecated from 0.3.0. this is false by default and is not an option.
-     * @param sticky boolean
+     * @param sticky
+     *            boolean
      */
     @Deprecated
     public void setSticky(final boolean sticky)
@@ -509,49 +512,49 @@ public class KeyValueStoreSessionManager extends NoSqlSessionManager
     }
 
     /*
-     * Overrides some of the state logic in NoSqlSession to avoid unnecessary session store writes when the
-     * session attributes have not changed.  This is a workaround for Jetty issue 413484:
+     * Overrides some of the state logic in NoSqlSession to avoid unnecessary session store writes when the session
+     * attributes have not changed. This is a workaround for Jetty issue 413484:
      * https://bugs.eclipse.org/bugs/show_bug.cgi?id=413484
      */
     private static class SmarterNoSqlSession extends NoSqlSession
     {
-        private HashMap<String, Integer> attributeHashes = new HashMap<String, Integer>();
+        private HashMap<String, Integer> attributeHashes = new HashMap<>();
 
-        public SmarterNoSqlSession(NoSqlSessionManager manager, long created, long accessed, String clusterId, Object version)
+        public SmarterNoSqlSession(final NoSqlSessionManager manager, final long created, final long accessed,
+            final String clusterId, final Object version)
         {
             super(manager, created, accessed, clusterId, version);
         }
 
         /**
-         * Sets an attribute without changing the session's "dirty" state.  Use this only when initializing a
-         * freshly loaded session.
+         * Sets an attribute without changing the session's "dirty" state. Use this only when initializing a freshly
+         * loaded session.
          */
-        public void initializeAttribute(String name, Object value)
+        public void initializeAttribute(final String name, final Object value)
         {
             getAttributeMap().put(name, value);
             attributeHashes.put(name, safeHash(value));
         }
 
         /**
-         * Overridden to change the attribute (which sets the "dirty" state) only if the new attribute value
-         * is not equal to the old attribute value.
+         * Overridden to change the attribute (which sets the "dirty" state) only if the new attribute value is not
+         * equal to the old attribute value.
          */
         @Override
-        public Object doPutOrRemove(String name, Object value)
+        public Object doPutOrRemove(final String name, final Object value)
         {
             Object oldValue = doGet(name);
             return (valueEquals(oldValue, value)) ? value : super.doPutOrRemove(name, value);
         }
 
         /**
-         * Overridden to update the session state prior to saving if any attribute value has a different
-         * hash code than it used to.  This allows us to detect changes when a mutable object is used as
-         * an attribute value.
+         * Overridden to update the session state prior to saving if any attribute value has a different hash code than
+         * it used to. This allows us to detect changes when a mutable object is used as an attribute value.
          */
         @Override
         protected void complete()
         {
-            for (Map.Entry<String, Object> a: getAttributeMap().entrySet())
+            for (Map.Entry<String, Object> a : getAttributeMap().entrySet())
             {
                 Integer oldHash = attributeHashes.get(a.getKey());
                 if (oldHash == null || oldHash.intValue() != safeHash(a.getValue()))
@@ -564,21 +567,21 @@ public class KeyValueStoreSessionManager extends NoSqlSessionManager
         }
 
         @Override
-        protected void save(boolean activate)
+        protected void save(final boolean activate)
         {
-            for (Map.Entry<String, Object> a: getAttributeMap().entrySet())
+            for (Map.Entry<String, Object> a : getAttributeMap().entrySet())
             {
                 attributeHashes.put(a.getKey(), safeHash(a.getValue()));
             }
             super.save(activate);
         }
 
-        private boolean valueEquals(Object ov, Object nv)
+        private boolean valueEquals(final Object ov, final Object nv)
         {
             return (nv == null) ? (ov == null) : nv.equals(ov);
         }
 
-        private int safeHash(Object o)
+        private int safeHash(final Object o)
         {
             return (o == null) ? 0 : o.hashCode();
         }
