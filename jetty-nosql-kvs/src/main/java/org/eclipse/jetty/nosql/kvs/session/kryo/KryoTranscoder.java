@@ -3,14 +3,14 @@ package org.eclipse.jetty.nosql.kvs.session.kryo;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 
-import org.eclipse.jetty.nosql.kvs.session.ISerializationTranscoder;
+import org.eclipse.jetty.nosql.kvs.session.AbstractSerializationTranscoder;
 import org.eclipse.jetty.nosql.kvs.session.TranscoderException;
 
 import com.esotericsoftware.kryo.Kryo;
 import com.esotericsoftware.kryo.io.Input;
 import com.esotericsoftware.kryo.io.Output;
 
-public class KryoTranscoder implements ISerializationTranscoder {
+public class KryoTranscoder extends AbstractSerializationTranscoder {
   
   private ThreadLocal<Kryo> kryos = new ThreadLocal<Kryo>() {
     @Override

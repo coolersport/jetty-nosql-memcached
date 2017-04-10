@@ -1,11 +1,11 @@
 package org.eclipse.jetty.nosql.kvs.session.xstream;
 
-import org.eclipse.jetty.nosql.kvs.session.ISerializationTranscoder;
+import org.eclipse.jetty.nosql.kvs.session.AbstractSerializationTranscoder;
 import org.eclipse.jetty.nosql.kvs.session.TranscoderException;
 
 import com.thoughtworks.xstream.XStream;
 
-public class XStreamTranscoder implements ISerializationTranscoder {
+public class XStreamTranscoder extends AbstractSerializationTranscoder {
   private XStream xstream = null;
   private ClassLoader classLoader = null;
 

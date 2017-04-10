@@ -43,7 +43,7 @@ public class XStreamSessionFactory extends AbstractSessionFactory {
   @Override
   public void setClassLoader(ClassLoader cl) {
     XStreamTranscoder tc = new XStreamTranscoder(cl);
-    transcoder = tc;
+    setTranscoder(tc);
   }
 }
 

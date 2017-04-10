@@ -6,13 +6,10 @@ import org.eclipse.jetty.nosql.kvs.session.ISerializationTranscoder;
 import org.eclipse.jetty.nosql.kvs.session.TranscoderException;
 
 public class SerializableSessionFactory extends AbstractSessionFactory {
-	public SerializableSessionFactory() {
-		this(Thread.currentThread().getContextClassLoader());
-	}
-
-	public SerializableSessionFactory(ClassLoader cl) {
-		super(new SerializableTranscoder(cl));
-	}
+    public SerializableSessionFactory()
+    {
+        super(new SerializableTranscoder());
+    }
 
 	public ISerializableSession create() {
 		return new SerializableSession();
@@ -40,9 +37,9 @@ public class SerializableSessionFactory extends AbstractSessionFactory {
 		return session;
 	}
 
-	@Override
-	public void setClassLoader(ClassLoader cl) {
-		SerializableTranscoder tc = new SerializableTranscoder(cl);
-		transcoder = tc;
-	}
+    @Override
+    public void setClassLoader(final ClassLoader cl)
+    {
+        // do nothing
+    }
 }

@@ -43,6 +43,6 @@ public class KryoSessionFactory extends AbstractSessionFactory {
   @Override
   public void setClassLoader(ClassLoader cl) {
     KryoTranscoder tc = new KryoTranscoder(cl);
-    transcoder = tc;
+    setTranscoder(tc);
   }
 }

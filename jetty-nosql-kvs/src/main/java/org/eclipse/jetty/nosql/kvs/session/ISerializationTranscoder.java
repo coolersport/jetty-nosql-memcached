@@ -17,6 +17,25 @@ public interface ISerializationTranscoder {
 //
 //	public byte[] encode(double d) throws TranscoderException;
 
+    /**
+     * <p>
+     * Determine if the transcoder is set to compress/uncompress data during encode/decode process.
+     * </p>
+     * 
+     * @since 0.3.2
+     * @return true if data will be transferred in compressed state, false otherwise
+     **/
+    boolean isCompressionEnabled();
+
+    /**
+     * <p>
+     * Specify if the transcoder should compress/uncompress data during encode/decode process.
+     * </p>
+     * 
+     * @since 0.3.2
+     **/
+    void setCompressionEnabled(boolean enabled);
+
 	/**
 	 * serialize an object to byte array
 	 * @param obj to serialize
